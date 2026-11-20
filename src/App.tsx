@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 type StoreChoice = { name: string; preference: number }
@@ -50,6 +50,15 @@ type SavedWeeklyPlan = {
   items: PlanItem[]
 }
 type RecipeMetadata = Record<string, { rating: number; lastCookedAt: string | null }>
+type FamilyConfig = { projectUrl: string; anonKey: string; accessCode: string }
+type SharedAppState = {
+  plan: PlanItem[]
+  lists: GroceryList[]
+  savedPlans: SavedWeeklyPlan[]
+  recipeMetadata: RecipeMetadata
+}
+type RemoteFamilyState = { state: SharedAppState | null; updatedAt: string | null }
+type SyncStatus = 'local' | 'connecting' | 'connected' | 'syncing' | 'error'
 
 const recipes: Recipe[] = [
   {
@@ -106,6 +115,9 @@ const storageKey = 'table-and-thyme-grocery-lists'
 const planStorageKey = 'table-and-thyme-weekly-plan'
 const savedPlansStorageKey = 'table-and-thyme-saved-weekly-plans'
 const recipeMetadataStorageKey = 'table-and-thyme-recipe-metadata'
+const familyConfigStorageKey = 'table-and-thyme-family-connection'
+const supabaseProjectUrl = 'https://kdcgareakwfnjisntlyj.supabase.co'
+const supabasePublishableKey = 'sb_publishable_aKw1gSxU_uuVtf_7NJh2nw_6ZiPv9wQ'
 const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
 const legacyTextTranslations: Record<string, string> = {
   'Chicken breast': 'Filet de poulet',
@@ -200,6 +212,40 @@ function formatQuantity(amount: number): string {
   return amount.toLocaleString('fr-FR', { maximumFractionDigits: 1 })
 }
 
+function readFamilyConfig(): FamilyConfig | null {
+  const saved = readStored<FamilyConfig | null>(familyConfigStorageKey, null)
+  return saved?.accessCode ? { ...saved, projectUrl: supabaseProjectUrl, anonKey: supabasePublishableKey } : null
+}
+
+function normalizeSharedState(value: unknown): SharedAppState | null {
+  if (!value || typeof value !== 'object') return null
+  const candidate = value as Partial<SharedAppState>
+  if (!Array.isArray(candidate.plan) || !Array.isArray(candidate.lists) || !Array.isArray(candidate.savedPlans)) return null
+  return {
+    plan: candidate.plan,
+    lists: candidate.lists,
+    savedPlans: candidate.savedPlans,
+    recipeMetadata: { ...getDefaultRecipeMetadata(), ...(candidate.recipeMetadata ?? {}) },
+  }
+}
+
+async function requestFamilyState(config: FamilyConfig, method: 'GET' | 'POST', state?: SharedAppState): Promise<RemoteFamilyState> {
+  const projectUrl = config.projectUrl.trim().replace(/\/+$/, '')
+  const response = await fetch(`${projectUrl}/functions/v1/family-state`, {
+    method,
+    headers: {
+      apikey: config.anonKey.trim(),
+      'Content-Type': 'application/json',
+      'x-family-code': config.accessCode,
+    },
+    ...(method === 'POST' ? { body: JSON.stringify({ state }) } : {}),
+  })
+  const result = await response.json() as { state?: unknown; updatedAt?: string | null; error?: string; saved?: boolean }
+  if (!response.ok) throw new Error(result.error ?? `Erreur de synchronisation (${response.status}).`)
+  if (method === 'POST') return { state: null, updatedAt: result.updatedAt ?? new Date().toISOString() }
+  return { state: normalizeSharedState(result.state), updatedAt: result.updatedAt ?? null }
+}
+
 function makePlanItem(recipeId = recipes[0].id): PlanItem {
   const recipe = recipes.find((item) => item.id === recipeId) ?? recipes[0]
   const stores: Record<string, string> = {}
@@ -217,6 +263,12 @@ function App() {
   const [lists, setLists] = useState<GroceryList[]>(readLists)
   const [savedPlans, setSavedPlans] = useState<SavedWeeklyPlan[]>(() => readStored(savedPlansStorageKey, []))
   const [recipeMetadata, setRecipeMetadata] = useState<RecipeMetadata>(() => ({ ...getDefaultRecipeMetadata(), ...readStored(recipeMetadataStorageKey, {}) }))
+  const [familyConfig, setFamilyConfig] = useState<FamilyConfig | null>(readFamilyConfig)
+  const [familyForm, setFamilyForm] = useState<FamilyConfig>(() => readFamilyConfig() ?? { projectUrl: supabaseProjectUrl, anonKey: supabasePublishableKey, accessCode: '' })
+  const [familySettingsOpen, setFamilySettingsOpen] = useState(false)
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(() => readFamilyConfig() ? 'connecting' : 'local')
+  const [syncError, setSyncError] = useState('')
+  const [remoteReady, setRemoteReady] = useState(false)
   const [activeListId, setActiveListId] = useState<string | null>(null)
   const [openRecipeId, setOpenRecipeId] = useState<string | null>(null)
   const [expandedPlanItemId, setExpandedPlanItemId] = useState<string | null>(null)
@@ -226,6 +278,9 @@ function App() {
   const [typeFilter, setTypeFilter] = useState('')
   const [recipeSort, setRecipeSort] = useState('name-asc')
   const [recipeChoiceId, setRecipeChoiceId] = useState(recipes[0].id)
+  const localSnapshotRef = useRef<SharedAppState>({ plan, lists, savedPlans, recipeMetadata })
+  const lastUpdatedAtRef = useRef<string | null>(null)
+  const skipNextPushRef = useRef(false)
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(lists))
@@ -242,6 +297,112 @@ function App() {
   useEffect(() => {
     localStorage.setItem(recipeMetadataStorageKey, JSON.stringify(recipeMetadata))
   }, [recipeMetadata])
+
+  useEffect(() => {
+    localSnapshotRef.current = { plan, lists, savedPlans, recipeMetadata }
+  }, [plan, lists, savedPlans, recipeMetadata])
+
+  useEffect(() => {
+    const config = familyConfig
+    if (!config) return
+    const activeConfig: FamilyConfig = config
+
+    let active = true
+
+    async function connectAndPoll() {
+      try {
+        const remote = await requestFamilyState(activeConfig, 'GET')
+        if (!active) return
+        if (remote.state) {
+          skipNextPushRef.current = true
+          setPlan(remote.state.plan)
+          setLists(remote.state.lists)
+          setSavedPlans(remote.state.savedPlans)
+          setRecipeMetadata(remote.state.recipeMetadata)
+        } else {
+          const initialized = await requestFamilyState(activeConfig, 'POST', localSnapshotRef.current)
+          if (!active) return
+          lastUpdatedAtRef.current = initialized.updatedAt
+        }
+        lastUpdatedAtRef.current = remote.updatedAt ?? lastUpdatedAtRef.current
+        setRemoteReady(true)
+        setSyncStatus('connected')
+
+        const pollId = window.setInterval(async () => {
+          try {
+            const latest = await requestFamilyState(activeConfig, 'GET')
+            if (!active || !latest.state || !latest.updatedAt || latest.updatedAt <= (lastUpdatedAtRef.current ?? '')) return
+            lastUpdatedAtRef.current = latest.updatedAt
+            skipNextPushRef.current = true
+            setPlan(latest.state.plan)
+            setLists(latest.state.lists)
+            setSavedPlans(latest.state.savedPlans)
+            setRecipeMetadata(latest.state.recipeMetadata)
+            setSyncStatus('connected')
+          } catch (error) {
+            if (active) {
+              setSyncError(error instanceof Error ? error.message : 'Synchronisation impossible.')
+              setSyncStatus('error')
+            }
+          }
+        }, 15000)
+        return () => window.clearInterval(pollId)
+      } catch (error) {
+        if (active) {
+          setSyncError(error instanceof Error ? error.message : 'Connexion à la base impossible.')
+          setSyncStatus('error')
+        }
+      }
+    }
+
+    let stopPolling: (() => void) | undefined
+    void connectAndPoll().then((cleanup) => { stopPolling = cleanup })
+    return () => {
+      active = false
+      stopPolling?.()
+    }
+  }, [familyConfig])
+
+  useEffect(() => {
+    if (!familyConfig || !remoteReady) return
+    if (skipNextPushRef.current) {
+      skipNextPushRef.current = false
+      return
+    }
+    const timeoutId = window.setTimeout(async () => {
+      setSyncStatus('syncing')
+      try {
+        const result = await requestFamilyState(familyConfig, 'POST', localSnapshotRef.current)
+        lastUpdatedAtRef.current = result.updatedAt
+        setSyncError('')
+        setSyncStatus('connected')
+      } catch (error) {
+        setSyncError(error instanceof Error ? error.message : 'Synchronisation impossible.')
+        setSyncStatus('error')
+      }
+    }, 700)
+    return () => window.clearTimeout(timeoutId)
+  }, [plan, lists, savedPlans, recipeMetadata, familyConfig, remoteReady])
+
+  function saveFamilyConnection(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const nextConfig = {
+      projectUrl: supabaseProjectUrl,
+      anonKey: supabasePublishableKey,
+      accessCode: familyForm.accessCode.trim(),
+    }
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(nextConfig.projectUrl) || !nextConfig.anonKey || nextConfig.accessCode.length < 16) {
+      setSyncError('Vérifiez l’URL, la clé publique et utilisez un code familial d’au moins 16 caractères.')
+      setSyncStatus('error')
+      return
+    }
+    localStorage.setItem(familyConfigStorageKey, JSON.stringify(nextConfig))
+    setRemoteReady(false)
+    setSyncStatus('connecting')
+    setSyncError('')
+    setFamilyConfig(nextConfig)
+    setFamilySettingsOpen(false)
+  }
 
   const activeList = lists.find((list) => list.id === activeListId)
   const selectedRecipeCount = plan.filter((item) => item.recipeId).length
@@ -368,7 +529,7 @@ function App() {
       <main className="main-content">
         <header className="topbar">
           <div className="breadcrumbs">MA CUISINE <span>/</span> {page === 'plan' || page === 'review' ? 'MENUS DE LA SEMAINE' : page === 'lists' || page === 'detail' ? 'LISTES DE COURSES' : 'RECETTES'}</div>
-          <div className="topbar-right"><span className="local-indicator"><i /> ENREGISTRÉ DANS CE NAVIGATEUR</span><span className="top-date">{todayLabel}</span></div>
+          <div className="topbar-right"><button className={`family-status status-${syncStatus}`} onClick={() => { setFamilyForm(familyConfig ?? familyForm); setFamilySettingsOpen(true) }}><i />{syncStatus === 'local' ? 'DONNÉES LOCALES' : syncStatus === 'connecting' ? 'CONNEXION…' : syncStatus === 'syncing' ? 'SYNCHRONISATION…' : syncStatus === 'error' ? 'ERREUR DE SYNCHRO' : 'FAMILLE SYNCHRONISÉE'}</button><span className="top-date">{todayLabel}</span></div>
         </header>
 
         {page === 'plan' && <section className="workspace">
@@ -477,6 +638,11 @@ function App() {
           </section>
         )}
       </main>
+      {familySettingsOpen && <div className="family-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setFamilySettingsOpen(false) }}><section className="family-modal" role="dialog" aria-modal="true" aria-labelledby="family-modal-title"><button className="family-modal-close" aria-label="Fermer" onClick={() => setFamilySettingsOpen(false)}>×</button><p className="eyebrow">PARTAGE FAMILIAL</p><h2 id="family-modal-title">Synchroniser vos appareils</h2><p className="family-modal-copy">Configurez la connexion une fois sur chaque téléphone. Le même code familial donne accès aux mêmes menus et listes, sans compte utilisateur.</p>
+        {syncError && <p className="family-error" role="alert">{syncError}</p>}
+        <form className="family-form" onSubmit={saveFamilyConnection}><p className="family-project-label">Projet partagé : <b>recettes-famille</b></p><label>Code familial partagé<input type="password" required minLength={16} autoComplete="new-password" placeholder="Au moins 16 caractères" value={familyForm.accessCode} onChange={(event) => setFamilyForm({ ...familyForm, accessCode: event.target.value })} /></label><p className="family-code-note">Le code doit aussi être défini comme secret <code>FAMILY_ACCESS_CODE</code> dans Supabase. Il est mémorisé uniquement dans ce navigateur. Choisissez un code long et difficile à deviner.</p><div className="family-modal-actions"><button type="button" className="secondary-button" onClick={() => setFamilySettingsOpen(false)}>Fermer</button><button type="submit" className="primary-button">Connecter cet appareil <span>→</span></button></div></form>
+        <p className="family-sync-footnote">{syncStatus === 'connected' ? 'Les changements se synchronisent entre appareils environ toutes les 15 secondes.' : 'En mode local, vos données restent enregistrées uniquement dans ce navigateur.'}</p>
+      </section></div>}
     </div>
   )
 }
