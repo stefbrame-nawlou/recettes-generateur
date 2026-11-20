@@ -1,0 +1,2 @@
+[functions.family-state]
+verify_jwt = false
