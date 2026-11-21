@@ -19,7 +19,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Skip when deployment secrets are missing
         if: env.SUPABASE_ACCESS_TOKEN == '' || env.FAMILY_ACCESS_CODE == ''
-        run: echo "Add SUPABASE_ACCESS_TOKEN and FAMILY_ACCESS_CODE repository secrets to deploy the function."
+        run: echo "Add the two repository secrets before deploying."
+      - name: Prepare Supabase config
+        run: |
+          mkdir -p supabase
+          printf '[functions.family-state]\nverify_jwt = false\n' > supabase/config.toml
       - name: Set up Supabase CLI
         if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
         uses: supabase/setup-cli@v1
