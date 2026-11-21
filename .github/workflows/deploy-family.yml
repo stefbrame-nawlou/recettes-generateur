@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - supabase/functions/family-state/**
-      - .github/workflows/deploy-family-sync.yml
+      - .github/workflows/deploy-family.yml
   workflow_dispatch:
 
 jobs:
@@ -17,14 +17,17 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Skip when deployment secrets are missing
+        if: env.SUPABASE_ACCESS_TOKEN == '' || env.FAMILY_ACCESS_CODE == ''
+        run: echo "Add SUPABASE_ACCESS_TOKEN and FAMILY_ACCESS_CODE repository secrets to deploy the function."
       - name: Set up Supabase CLI
-        if: env.SUPABASE_ACCESS_TOKEN != "" && env.FAMILY_ACCESS_CODE != ""
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
         uses: supabase/setup-cli@v1
         with:
           version: latest
       - name: Configure family access code
-        if: env.SUPABASE_ACCESS_TOKEN != "" && env.FAMILY_ACCESS_CODE != ""
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
         run: supabase secrets set FAMILY_ACCESS_CODE="$FAMILY_ACCESS_CODE" --project-ref kdcgareakwfnjisntlyj
       - name: Deploy family-state function
-        if: env.SUPABASE_ACCESS_TOKEN != "" && env.FAMILY_ACCESS_CODE != ""
+        if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
         run: supabase functions deploy family-state --project-ref kdcgareakwfnjisntlyj --no-verify-jwt
