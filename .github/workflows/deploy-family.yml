@@ -2,37 +2,38 @@ name: Deploy family sync to Supabase
 
 on:
   push:
-    branches: [main]
-    paths:
-      - supabase/functions/family-state/**
-      - .github/workflows/deploy-family.yml
-  workflow_dispatch:
+      branches: [main]
+          paths:
+                - supabase/functions/family-state/**
+                      - .github/workflows/deploy-family.yml
+                        workflow_dispatch:
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      FAMILY_ACCESS_CODE: ${{ secrets.FAMILY_ACCESS_CODE }}
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Skip when deployment secrets are missing
-        if: env.SUPABASE_ACCESS_TOKEN == '' || env.FAMILY_ACCESS_CODE == ''
-        run: echo "Add the two repository secrets before deploying."
-      - name: Prepare Supabase config
-        run: |
-          rm -rf supabase/config.toml
-          mkdir -p supabase
-          printf '[functions.family-state]\nverify_jwt = false\n' > supabase/config.toml
-      - name: Set up Supabase CLI
-        if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-      - name: Configure family access code
-        if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
-        run: supabase secrets set FAMILY_ACCESS_CODE="$FAMILY_ACCESS_CODE" --project-ref kdcgareakwfnjisntlyj
-      - name: Deploy family-state function
-        if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
-        run: supabase functions deploy family-state --project-ref kdcgareakwfnjisntlyj --no-verify-jwt
+                        jobs:
+                          deploy:
+                              runs-on: ubuntu-latest
+                                  env:
+                                        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+                                              FAMILY_ACCESS_CODE: ${{ secrets.FAMILY_ACCESS_CODE }}
+                                                  steps:
+                                                        - name: Check out repository
+                                                                uses: actions/checkout@v4
+                                                                      - name: Skip when deployment secrets are missing
+                                                                              if: env.SUPABASE_ACCESS_TOKEN == '' || env.FAMILY_ACCESS_CODE == ''
+                                                                                      run: echo "Add the two repository secrets before deploying."
+                                                                                            - name: Prepare Supabase config
+                                                                                                    run: |
+                                                                                                              rm -rf supabase/config.toml
+                                                                                                                        mkdir -p supabase
+                                                                                                                                  printf '[functions.family-state]\nverify_jwt = false\n' > supabase/config.toml
+                                                                                                                                        - name: Set up Supabase CLI
+                                                                                                                                                if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
+                                                                                                                                                        uses: supabase/setup-cli@v1
+                                                                                                                                                                with:
+                                                                                                                                                                          version: latest
+                                                                                                                                                                                - name: Configure family access code
+                                                                                                                                                                                        if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
+                                                                                                                                                                                                run: supabase secrets set FAMILY_ACCESS_CODE="$FAMILY_ACCESS_CODE" --project-ref kdcgareakwfnjisntlyj --yes
+                                                                                                                                                                                                      - name: Deploy family-state function
+                                                                                                                                                                                                              if: env.SUPABASE_ACCESS_TOKEN != '' && env.FAMILY_ACCESS_CODE != ''
+                                                                                                                                                                                                                      run: supabase functions deploy family-state --project-ref kdcgareakwfnjisntlyj --no-verify-jwt
+                                                                                                                                                                                                                      
