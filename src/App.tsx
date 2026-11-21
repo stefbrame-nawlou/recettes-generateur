@@ -63,7 +63,7 @@ type RemoteFamilyState = { state: SharedAppState | null; updatedAt: string | nul
 type SyncStatus = 'local' | 'connecting' | 'connected' | 'syncing' | 'error'
 
 const storeNames = ['Colruyt ch. Wavre', 'Delhaize Hankar', 'Delhaize Boileau', 'Carrefour Thieffry', 'Farm Hankar']
-const availableStoreNames = [...new Set([...storeNames, 'Boucherie', 'MarchÃ©', 'SupermarchÃ©', 'Fromagerie'])]
+const availableStoreNames = storeNames; const legacyStoreAliases: Record<string, string> = { Boucherie: 'Delhaize Hankar', Marché: 'Farm Hankar', Supermarché: 'Colruyt ch. Wavre', Fromagerie: 'Delhaize Boileau' }
 const recipeStorageKey = 'table-and-thyme-recipes'
 
 const baseRecipes: Recipe[] = [
@@ -71,49 +71,49 @@ const baseRecipes: Recipe[] = [
     id: 'lemon-chicken',
     name: 'Poulet au citron et pommes de terre croustillantes',
     category: 'UN CLASSIQUE DE LA SEMAINE',
-    types: ['Viande', 'Cuisine europÃ©enne'],
+    types: ['Viande', 'Cuisine européenne'],
     time: 40,
     servings: 2,
     ingredients: [
-      { name: 'Filet de poulet', amount: 300, unit: 'g', stores: [{ name: 'Boucherie', preference: 1 }, { name: 'MarchÃ©', preference: 2 }] },
-      { name: 'Pommes de terre', amount: 500, unit: 'g', stores: [{ name: 'MarchÃ©', preference: 1 }, { name: 'SupermarchÃ©', preference: 2 }] },
-      { name: 'Citron', amount: 1, unit: 'piÃ¨ce', stores: [{ name: 'MarchÃ©', preference: 1 }, { name: 'SupermarchÃ©', preference: 2 }] },
-      { name: 'Haricots verts', amount: 200, unit: 'g', stores: [{ name: 'MarchÃ©', preference: 1 }, { name: 'SupermarchÃ©', preference: 2 }] },
-      { name: "Huile dâ€™olive", amount: 2, unit: 'c. Ã  soupe', stores: [{ name: 'SupermarchÃ©', preference: 1 }] },
+      { name: 'Filet de poulet', amount: 300, unit: 'g', stores: [{ name: 'Boucherie', preference: 1 }, { name: 'Marché', preference: 2 }] },
+      { name: 'Pommes de terre', amount: 500, unit: 'g', stores: [{ name: 'Marché', preference: 1 }, { name: 'Supermarché', preference: 2 }] },
+      { name: 'Citron', amount: 1, unit: 'pièce', stores: [{ name: 'Marché', preference: 1 }, { name: 'Supermarché', preference: 2 }] },
+      { name: 'Haricots verts', amount: 200, unit: 'g', stores: [{ name: 'Marché', preference: 1 }, { name: 'Supermarché', preference: 2 }] },
+      { name: "Huile d’olive", amount: 2, unit: 'c. à soupe', stores: [{ name: 'Supermarché', preference: 1 }] },
     ],
-    instructions: ['PrÃ©chauffez le four Ã  210 Â°C. Coupez les pommes de terre en quartiers et mÃ©langez-les avec lâ€™huile dâ€™olive, du sel et du poivre.', 'Enfournez les pommes de terre pendant 30 minutes en les retournant Ã  mi-cuisson. Assaisonnez le poulet et faites-le dorer Ã  la poÃªle jusquâ€™Ã  ce quâ€™il soit cuit.', 'Faites cuire les haricots verts Ã  la vapeur. Arrosez le poulet de jus de citron et servez le tout.'],
+    instructions: ['Préchauffez le four à 210 °C. Coupez les pommes de terre en quartiers et mélangez-les avec l’huile d’olive, du sel et du poivre.', 'Enfournez les pommes de terre pendant 30 minutes en les retournant à mi-cuisson. Assaisonnez le poulet et faites-le dorer à la poêle jusqu’à ce qu’il soit cuit.', 'Faites cuire les haricots verts à la vapeur. Arrosez le poulet de jus de citron et servez le tout.'],
   },
   {
     id: 'courgette-pasta',
-    name: 'PÃ¢tes crÃ©meuses aux courgettes et au basilic',
+    name: 'Pâtes crémeuses aux courgettes et au basilic',
     category: 'RAPIDE ET FRAIS',
-    types: ['VÃ©gÃ©tarien', 'Cuisine italienne'],
+    types: ['Végétarien', 'Cuisine italienne'],
     time: 25,
     servings: 2,
     ingredients: [
-      { name: 'PÃ¢tes', amount: 180, unit: 'g', stores: [{ name: 'SupermarchÃ©', preference: 1 }] },
-      { name: 'Courgette', amount: 2, unit: 'piÃ¨ce', stores: [{ name: 'MarchÃ©', preference: 1 }, { name: 'SupermarchÃ©', preference: 2 }] },
-      { name: 'CrÃ¨me', amount: 120, unit: 'ml', stores: [{ name: 'SupermarchÃ©', preference: 1 }] },
-      { name: 'Parmesan', amount: 40, unit: 'g', stores: [{ name: 'Fromagerie', preference: 1 }, { name: 'SupermarchÃ©', preference: 2 }] },
-      { name: 'Basilic frais', amount: 10, unit: 'g', stores: [{ name: 'MarchÃ©', preference: 1 }] },
+      { name: 'Pâtes', amount: 180, unit: 'g', stores: [{ name: 'Supermarché', preference: 1 }] },
+      { name: 'Courgette', amount: 2, unit: 'pièce', stores: [{ name: 'Marché', preference: 1 }, { name: 'Supermarché', preference: 2 }] },
+      { name: 'Crème', amount: 120, unit: 'ml', stores: [{ name: 'Supermarché', preference: 1 }] },
+      { name: 'Parmesan', amount: 40, unit: 'g', stores: [{ name: 'Fromagerie', preference: 1 }, { name: 'Supermarché', preference: 2 }] },
+      { name: 'Basilic frais', amount: 10, unit: 'g', stores: [{ name: 'Marché', preference: 1 }] },
     ],
-    instructions: ['Faites cuire les pÃ¢tes dans de lâ€™eau salÃ©e jusquâ€™Ã  ce quâ€™elles soient al dente. RÃ©servez une tasse dâ€™eau de cuisson.', 'Coupez la courgette en rondelles et faites-la revenir jusquâ€™Ã  ce quâ€™elle soit dorÃ©e. Ajoutez la crÃ¨me et un peu dâ€™eau de cuisson.', 'MÃ©langez avec les pÃ¢tes, le parmesan et le basilic effeuillÃ©. Assaisonnez Ã  votre goÃ»t.'],
+    instructions: ['Faites cuire les pâtes dans de l’eau salée jusqu’à ce qu’elles soient al dente. Réservez une tasse d’eau de cuisson.', 'Coupez la courgette en rondelles et faites-la revenir jusqu’à ce qu’elle soit dorée. Ajoutez la crème et un peu d’eau de cuisson.', 'Mélangez avec les pâtes, le parmesan et le basilic effeuillé. Assaisonnez à votre goût.'],
   },
   {
     id: 'chickpea-curry',
     name: 'Curry de pois chiches au lait de coco',
-    category: 'VÃ‰GÃ‰TAL',
-    types: ['VÃ©gÃ©tarien', 'Cuisine indienne'],
+    category: 'VÉGÉTAL',
+    types: ['Végétarien', 'Cuisine indienne'],
     time: 35,
     servings: 3,
     ingredients: [
-      { name: 'Pois chiches', amount: 2, unit: 'boÃ®tes', stores: [{ name: 'SupermarchÃ©', preference: 1 }] },
-      { name: 'Lait de coco', amount: 400, unit: 'ml', stores: [{ name: 'SupermarchÃ©', preference: 1 }] },
-      { name: 'Ã‰pinards', amount: 150, unit: 'g', stores: [{ name: 'MarchÃ©', preference: 1 }, { name: 'SupermarchÃ©', preference: 2 }] },
-      { name: 'Oignon jaune', amount: 1, unit: 'piÃ¨ce', stores: [{ name: 'MarchÃ©', preference: 1 }, { name: 'SupermarchÃ©', preference: 2 }] },
-      { name: 'PÃ¢te de curry', amount: 2, unit: 'c. Ã  soupe', stores: [{ name: 'SupermarchÃ©', preference: 1 }] },
+      { name: 'Pois chiches', amount: 2, unit: 'boîtes', stores: [{ name: 'Supermarché', preference: 1 }] },
+      { name: 'Lait de coco', amount: 400, unit: 'ml', stores: [{ name: 'Supermarché', preference: 1 }] },
+      { name: 'Épinards', amount: 150, unit: 'g', stores: [{ name: 'Marché', preference: 1 }, { name: 'Supermarché', preference: 2 }] },
+      { name: 'Oignon jaune', amount: 1, unit: 'pièce', stores: [{ name: 'Marché', preference: 1 }, { name: 'Supermarché', preference: 2 }] },
+      { name: 'Pâte de curry', amount: 2, unit: 'c. à soupe', stores: [{ name: 'Supermarché', preference: 1 }] },
     ],
-    instructions: ['Ã‰mincez lâ€™oignon et faites-le revenir doucement jusquâ€™Ã  ce quâ€™il soit tendre. Ajoutez la pÃ¢te de curry et faites cuire une minute.', 'Ajoutez les pois chiches Ã©gouttÃ©s et le lait de coco. Laissez mijoter 20 minutes.', 'Incorporez les Ã©pinards et laissez-les fondre. Servez avec du riz ou du pain plat.'],
+    instructions: ['Émincez l’oignon et faites-le revenir doucement jusqu’à ce qu’il soit tendre. Ajoutez la pâte de curry et faites cuire une minute.', 'Ajoutez les pois chiches égouttés et le lait de coco. Laissez mijoter 20 minutes.', 'Incorporez les épinards et laissez-les fondre. Servez avec du riz ou du pain plat.'],
   },
 ]
 
@@ -130,27 +130,46 @@ const legacyTextTranslations: Record<string, string> = {
   Potatoes: 'Pommes de terre',
   Lemon: 'Citron',
   'Green beans': 'Haricots verts',
-  'Olive oil': "Huile dâ€™olive",
-  Pasta: 'PÃ¢tes',
-  Cream: 'CrÃ¨me',
+  'Olive oil': "Huile d’olive",
+  Pasta: 'Pâtes',
+  Cream: 'Crème',
   'Fresh basil': 'Basilic frais',
   Chickpeas: 'Pois chiches',
   'Coconut milk': 'Lait de coco',
-  Spinach: 'Ã‰pinards',
+  Spinach: 'Épinards',
   'Yellow onion': 'Oignon jaune',
-  'Curry paste': 'PÃ¢te de curry',
+  'Curry paste': 'Pâte de curry',
   Butcher: 'Boucherie',
-  Market: 'MarchÃ©',
-  Supermarket: 'SupermarchÃ©',
+  Market: 'Marché',
+  Supermarket: 'Supermarché',
   'Cheese shop': 'Fromagerie',
   'Grocery list': 'Liste de courses',
   'Weekly plan': 'Menu de la semaine',
 }
 
+function normalizeRecipes(source: Recipe[]): Recipe[] {
+  return source.map((recipe) => ({
+    ...recipe,
+    ingredients: recipe.ingredients.map((ingredient) => {
+      const seen = new Set<string>()
+      const stores = ingredient.stores.flatMap((store) => {
+        const name = legacyStoreAliases[store.name] ?? store.name
+        if (!storeNames.includes(name) || seen.has(name)) return []
+        seen.add(name)
+        return [{ ...store, name, preference: seen.size }]
+      })
+      return {
+        ...ingredient,
+        stores: stores.length ? stores : storeNames.map((name, index) => ({ name, preference: index + 1 })),
+      }
+    }),
+  }))
+}
+
 function readRecipes(): Recipe[] {
   const saved = readStored<Recipe[] | null>(recipeStorageKey, null)
-  if (!saved?.length) return baseRecipes
-  return saved
+
+  return normalizeRecipes(saved?.length ? saved : baseRecipes)
 }
 
 function displayFrench(value: string): string {
@@ -158,9 +177,9 @@ function displayFrench(value: string): string {
 }
 
 function displayFrenchUnit(unit: string, amount = 1): string {
-  const singular = ({ pc: 'piÃ¨ce', pcs: 'piÃ¨ce', cans: 'boÃ®te', can: 'boÃ®te' })[unit] ?? unit
-  if (singular === 'piÃ¨ce' || singular === 'boÃ®te') return amount > 1 ? `${singular}s` : singular
-  return unit === 'tbsp' ? 'c. Ã  soupe' : singular
+  const singular = ({ pc: 'pièce', pcs: 'pièce', cans: 'boîte', can: 'boîte' })[unit] ?? unit
+  if (singular === 'pièce' || singular === 'boîte') return amount > 1 ? `${singular}s` : singular
+  return unit === 'tbsp' ? 'c. à soupe' : singular
 }
 
 function formatFrenchDate(date: string | Date, options: Intl.DateTimeFormatOptions): string {
@@ -168,7 +187,7 @@ function formatFrenchDate(date: string | Date, options: Intl.DateTimeFormatOptio
 }
 
 function groceryListTitle(list: GroceryList): string {
-  return `Liste de courses Â· ${formatFrenchDate(list.createdAt, { day: 'numeric', month: 'short' })}`
+  return `Liste de courses · ${formatFrenchDate(list.createdAt, { day: 'numeric', month: 'short' })}`
 }
 
 function readLists(): GroceryList[] {
@@ -234,7 +253,7 @@ function normalizeSharedState(value: unknown): SharedAppState | null {
   const candidate = value as Partial<SharedAppState>
   if (!Array.isArray(candidate.recipes) || !candidate.recipes.length || !Array.isArray(candidate.plan) || !Array.isArray(candidate.lists) || !Array.isArray(candidate.savedPlans)) return null
   return {
-    recipes: candidate.recipes,
+    recipes: normalizeRecipes(candidate.recipes),
     plan: candidate.plan,
     lists: candidate.lists,
     savedPlans: candidate.savedPlans,
@@ -372,7 +391,7 @@ function App() {
         return () => window.clearInterval(pollId)
       } catch (error) {
         if (active) {
-          setSyncError(error instanceof Error ? error.message : 'Connexion Ã  la base impossible.')
+          setSyncError(error instanceof Error ? error.message : 'Connexion à la base impossible.')
           setSyncStatus('error')
         }
       }
@@ -415,7 +434,7 @@ function App() {
       accessCode: familyForm.accessCode.trim(),
     }
     if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(nextConfig.projectUrl) || !nextConfig.anonKey || nextConfig.accessCode.length < 16) {
-      setSyncError('VÃ©rifiez lâ€™URL, la clÃ© publique et utilisez un code familial dâ€™au moins 16 caractÃ¨res.')
+      setSyncError('Vérifiez l’URL, la clé publique et utilisez un code familial d’au moins 16 caractères.')
       setSyncStatus('error')
       return
     }
@@ -478,7 +497,7 @@ function App() {
   }
 
   function openRecipeEditor(recipe?: Recipe) {
-    const source = recipe ?? { id: '', name: '', category: 'NOUVELLE RECETTE', types: ['VÃ©gÃ©tarien'], time: 30, servings: 2, ingredients: [{ name: '', amount: 1, unit: 'g', stores: storeNames.map((name, index) => ({ name, preference: index + 1 })) }], instructions: [''] }
+    const source = recipe ?? { id: '', name: '', category: 'NOUVELLE RECETTE', types: ['Végétarien'], time: 30, servings: 2, ingredients: [{ name: '', amount: 1, unit: 'g', stores: storeNames.map((name, index) => ({ name, preference: index + 1 })) }], instructions: [''] }
     setEditingRecipeId(recipe?.id ?? null)
     setRecipeDraft({ ...source, ingredients: source.ingredients.map((ingredient) => ({ ...ingredient, stores: [...ingredient.stores] })), instructions: [...source.instructions] })
     setRecipeEditorOpen(true)
@@ -542,13 +561,13 @@ function App() {
     const timestamp = now.toISOString()
     const nextList: GroceryList = {
       id: crypto.randomUUID(),
-      name: `Liste de courses Â· ${formatFrenchDate(now, { day: 'numeric', month: 'short' })}`,
+      name: `Liste de courses · ${formatFrenchDate(now, { day: 'numeric', month: 'short' })}`,
       createdAt: timestamp,
       items: groupedIngredients.map((item) => ({ ...item, id: crypto.randomUUID() })),
     }
     const nextSavedPlan: SavedWeeklyPlan = {
       id: crypto.randomUUID(),
-      name: `Menu de la semaine Â· ${formatFrenchDate(now, { day: 'numeric', month: 'long', year: 'numeric' })}`,
+      name: `Menu de la semaine · ${formatFrenchDate(now, { day: 'numeric', month: 'long', year: 'numeric' })}`,
       createdAt: timestamp,
       items: JSON.parse(JSON.stringify(plan)) as PlanItem[],
     }
@@ -581,103 +600,103 @@ function App() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <a className="brand" href="#plan" onClick={() => setPage('plan')} aria-label="Accueil Recettes gÃ©nÃ©rateur">
+        <a className="brand" href="#plan" onClick={() => setPage('plan')} aria-label="Accueil Recettes générateur">
           <span className="brand-mark">R<span>G</span></span>
-          <span className="brand-name">recettes <i>gÃ©nÃ©rateur</i></span>
+          <span className="brand-name">recettes <i>générateur</i></span>
         </a>
         <div className="side-label">MA CUISINE</div>
         <nav className="main-nav" aria-label="Navigation principale">
           {nav.map((item) => (
             <button key={item.id} className={`nav-item ${page === item.id || (item.id === 'plan' && page === 'review') || (item.id === 'lists' && page === 'detail') ? 'active' : ''}`} onClick={() => setPage(item.id)}>
-              <span className={`nav-mark mark-${item.id}`} aria-hidden="true">{item.id === 'plan' ? 'â—·' : item.id === 'lists' ? 'â˜·' : 'â–¤'}</span>
+              <span className={`nav-mark mark-${item.id}`} aria-hidden="true">{item.id === 'plan' ? '◷' : item.id === 'lists' ? '☷' : '▤'}</span>
               <span>{item.label}</span>
               <span className="nav-count">{item.count}</span>
             </button>
           ))}
         </nav>
         <div className="sidebar-note">
-          <span className="note-spark">âœ³</span>
-          <p>Un peu plus dâ€™intention.<br />Un peu moins de gaspillage.</p>
+          <span className="note-spark">✳</span>
+          <p>Un peu plus d’intention.<br />Un peu moins de gaspillage.</p>
         </div>
-        <div className="profile-row"><span className="profile-avatar">C</span><span><b>Mon carnet de cuisine</b><small>Espace local</small></span><span className="profile-dots">Â·Â·Â·</span></div>
+        <div className="profile-row"><span className="profile-avatar">C</span><span><b>Mon carnet de cuisine</b><small>Espace local</small></span><span className="profile-dots">···</span></div>
       </aside>
 
       <main className="main-content">
         <header className="topbar">
           <div className="breadcrumbs">MA CUISINE <span>/</span> {page === 'plan' || page === 'review' ? 'MENUS DE LA SEMAINE' : page === 'lists' || page === 'detail' ? 'LISTES DE COURSES' : 'RECETTES'}</div>
-          <div className="topbar-right"><button className={`family-status status-${syncStatus}`} onClick={() => { setFamilyForm(familyConfig ?? familyForm); setFamilySettingsOpen(true) }}><i />{syncStatus === 'local' ? 'DONNÃ‰ES LOCALES' : syncStatus === 'connecting' ? 'CONNEXIONâ€¦' : syncStatus === 'syncing' ? 'SYNCHRONISATIONâ€¦' : syncStatus === 'error' ? 'ERREUR DE SYNCHRO' : 'FAMILLE SYNCHRONISÃ‰E'}</button><span className="top-date">{todayLabel}</span></div>
+          <div className="topbar-right"><button className={`family-status status-${syncStatus}`} onClick={() => { setFamilyForm(familyConfig ?? familyForm); setFamilySettingsOpen(true) }}><i />{syncStatus === 'local' ? 'DONNÉES LOCALES' : syncStatus === 'connecting' ? 'CONNEXION…' : syncStatus === 'syncing' ? 'SYNCHRONISATION…' : syncStatus === 'error' ? 'ERREUR DE SYNCHRO' : 'FAMILLE SYNCHRONISÉE'}</button><span className="top-date">{todayLabel}</span></div>
         </header>
 
         {page === 'plan' && <section className="workspace">
           <div className="page-heading">
-            <div><p className="eyebrow">BIEN COMMENCER LA SEMAINE</p><h1>Au menu cette semaine<span>.</span></h1><p className="heading-sub">Choisissez vos recettes, nous prÃ©parons la liste de courses.</p></div>
-            <div className="week-picker"><span className="calendar-icon">â–¦</span><span><small>MENU DE</small><b>Cette semaine</b></span><span className="chevron">âŒ„</span></div>
+            <div><p className="eyebrow">BIEN COMMENCER LA SEMAINE</p><h1>Au menu cette semaine<span>.</span></h1><p className="heading-sub">Choisissez vos recettes, nous préparons la liste de courses.</p></div>
+            <div className="week-picker"><span className="calendar-icon">▦</span><span><small>MENU DE</small><b>Cette semaine</b></span><span className="chevron">⌄</span></div>
           </div>
-          <div className="summary-strip"><div><span className="summary-number">{String(selectedRecipeCount).padStart(2, '0')}</span><span>recettes prÃ©vues</span></div><i /><div><span className="summary-number">{totalTime}</span><span>min en cuisine</span></div><div className="summary-spacer"/><span className="summary-caption">Les dates sont facultatives : cuisinez quand cela vous arrange.</span></div>
+          <div className="summary-strip"><div><span className="summary-number">{String(selectedRecipeCount).padStart(2, '0')}</span><span>recettes prévues</span></div><i /><div><span className="summary-number">{totalTime}</span><span>min en cuisine</span></div><div className="summary-spacer"/><span className="summary-caption">Les dates sont facultatives : cuisinez quand cela vous arrange.</span></div>
 
-          <div className="section-heading"><div><p className="eyebrow">VOTRE MENU</p><h2>Composez la semaine, un plat Ã  la fois</h2></div></div>
+          <div className="section-heading"><div><p className="eyebrow">VOTRE MENU</p><h2>Composez la semaine, un plat à la fois</h2></div></div>
           <div className="recipe-discovery">
-            <label className="recipe-search"><span aria-hidden="true">âŒ•</span><input aria-label="Rechercher des recettes" placeholder="Rechercher une recetteâ€¦" value={recipeSearch} onChange={(event) => setRecipeSearch(event.target.value)} /></label>
-            <select aria-label="Filtrer par ingrÃ©dient" value={ingredientFilter} onChange={(event) => setIngredientFilter(event.target.value)}><option value="">Tous les ingrÃ©dients</option>{recipeIngredients.map((ingredient) => <option key={ingredient}>{ingredient}</option>)}</select>
+            <label className="recipe-search"><span aria-hidden="true">⌕</span><input aria-label="Rechercher des recettes" placeholder="Rechercher une recette…" value={recipeSearch} onChange={(event) => setRecipeSearch(event.target.value)} /></label>
+            <select aria-label="Filtrer par ingrédient" value={ingredientFilter} onChange={(event) => setIngredientFilter(event.target.value)}><option value="">Tous les ingrédients</option>{recipeIngredients.map((ingredient) => <option key={ingredient}>{ingredient}</option>)}</select>
             <select aria-label="Filtrer par type de recette" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}><option value="">Tous les types et cuisines</option>{recipeTypes.map((type) => <option key={type}>{type}</option>)}</select>
-            <select aria-label="Trier les recettes" value={recipeSort} onChange={(event) => setRecipeSort(event.target.value)}><option value="name-asc">Nom Â· A Ã  Z</option><option value="name-desc">Nom Â· Z Ã  A</option><option value="rating-desc">Mieux notÃ©es</option><option value="rating-asc">Moins bien notÃ©es</option><option value="cooked-newest">CuisinÃ©es rÃ©cemment</option><option value="cooked-oldest">Pas cuisinÃ©es rÃ©cemment</option></select>
-            <button className="surprise-button" onClick={() => addRecipe(recipes[Math.floor(Math.random() * recipes.length)].id)}>âœ³ <span>Surprenez-moi</span></button>
-            <div className="recipe-add-row"><select aria-label="Choisir une recette Ã  ajouter" value={visibleRecipes.some((recipe) => recipe.id === recipeChoiceId) ? recipeChoiceId : (visibleRecipes[0]?.id ?? '')} onChange={(event) => setRecipeChoiceId(event.target.value)} disabled={!visibleRecipes.length}><option value="" disabled>Choisir une recette Ã  ajouter</option>{visibleRecipes.map((recipe) => <option key={recipe.id} value={recipe.id}>{recipe.name}</option>)}</select><button className="text-button" disabled={!visibleRecipes.length} onClick={() => addRecipe(visibleRecipes.find((recipe) => recipe.id === recipeChoiceId)?.id ?? visibleRecipes[0].id)}><span>+</span> Ajouter la recette</button></div>
-            {!visibleRecipes.length && <p className="no-recipes-found">Aucune recette ne correspond Ã  ces filtres.</p>}
+            <select aria-label="Trier les recettes" value={recipeSort} onChange={(event) => setRecipeSort(event.target.value)}><option value="name-asc">Nom · A à Z</option><option value="name-desc">Nom · Z à A</option><option value="rating-desc">Mieux notées</option><option value="rating-asc">Moins bien notées</option><option value="cooked-newest">Cuisinées récemment</option><option value="cooked-oldest">Pas cuisinées récemment</option></select>
+            <button className="surprise-button" onClick={() => addRecipe(recipes[Math.floor(Math.random() * recipes.length)].id)}>✳ <span>Surprenez-moi</span></button>
+            <div className="recipe-add-row"><select aria-label="Choisir une recette à ajouter" value={visibleRecipes.some((recipe) => recipe.id === recipeChoiceId) ? recipeChoiceId : (visibleRecipes[0]?.id ?? '')} onChange={(event) => setRecipeChoiceId(event.target.value)} disabled={!visibleRecipes.length}><option value="" disabled>Choisir une recette à ajouter</option>{visibleRecipes.map((recipe) => <option key={recipe.id} value={recipe.id}>{recipe.name}</option>)}</select><button className="text-button" disabled={!visibleRecipes.length} onClick={() => addRecipe(visibleRecipes.find((recipe) => recipe.id === recipeChoiceId)?.id ?? visibleRecipes[0].id)}><span>+</span> Ajouter la recette</button></div>
+            {!visibleRecipes.length && <p className="no-recipes-found">Aucune recette ne correspond à ces filtres.</p>}
           </div>
-          <div className="section-heading menu-heading"><div><p className="eyebrow">CETTE SEMAINE</p><h2>{selectedRecipeCount} {selectedRecipeCount === 1 ? 'recette prÃ©vue' : 'recettes prÃ©vues'}</h2></div><span className="collapse-hint">SÃ©lectionnez une recette pour afficher ses dÃ©tails</span></div>
+          <div className="section-heading menu-heading"><div><p className="eyebrow">CETTE SEMAINE</p><h2>{selectedRecipeCount} {selectedRecipeCount === 1 ? 'recette prévue' : 'recettes prévues'}</h2></div><span className="collapse-hint">Sélectionnez une recette pour afficher ses détails</span></div>
           <div className="recipe-plan-list">
             {plan.map((item, index) => {
               const recipe = recipes.find((entry) => entry.id === item.recipeId) ?? recipes[0]
               const isExpanded = expandedPlanItemId === item.id
               return <article className="plan-card" key={item.id}>
                 <div className="plan-card-heading">
-                  <button className="plan-card-toggle" aria-expanded={isExpanded} onClick={() => setExpandedPlanItemId(isExpanded ? null : item.id)}><span className="recipe-index">{String(index + 1).padStart(2, '0')}</span><span className="plan-recipe-name"><small>{recipe.category} Â· {recipe.types.join(' / ')}</small><b>{recipe.name}</b><span>â—· &nbsp;{recipe.time} min <i>Â·</i> {item.servings} portions <i>Â·</i> {item.date ? formatFrenchDate(`${item.date}T12:00:00`, { weekday: 'short', day: 'numeric', month: 'short' }) : 'Date Ã  dÃ©finir'}</span></span><span className="chevron">{isExpanded ? 'âŒƒ' : 'âŒ„'}</span></button>
-                  {plan.length > 1 && <button className="remove-button" title="Supprimer la recette" aria-label={`Supprimer ${recipe.name}`} onClick={() => { setPlan((items) => items.filter((entry) => entry.id !== item.id)); if (isExpanded) setExpandedPlanItemId(null) }}>Ã—</button>}
+                  <button className="plan-card-toggle" aria-expanded={isExpanded} onClick={() => setExpandedPlanItemId(isExpanded ? null : item.id)}><span className="recipe-index">{String(index + 1).padStart(2, '0')}</span><span className="plan-recipe-name"><small>{recipe.category} · {recipe.types.join(' / ')}</small><b>{recipe.name}</b><span>◷ &nbsp;{recipe.time} min <i>·</i> {item.servings} portions <i>·</i> {item.date ? formatFrenchDate(`${item.date}T12:00:00`, { weekday: 'short', day: 'numeric', month: 'short' }) : 'Date à définir'}</span></span><span className="chevron">{isExpanded ? '⌃' : '⌄'}</span></button>
+                  {plan.length > 1 && <button className="remove-button" title="Supprimer la recette" aria-label={`Supprimer ${recipe.name}`} onClick={() => { setPlan((items) => items.filter((entry) => entry.id !== item.id)); if (isExpanded) setExpandedPlanItemId(null) }}>×</button>}
                 </div>
                 {isExpanded && <>
-                <div className="plan-card-controls"><label className="date-field"><span className="eyebrow">Ã€ CUISINER LE <em>Â· FACULTATIF</em></span><input aria-label="Date de cuisson facultative" type="date" value={item.date} onChange={(event) => updatePlan(item.id, { date: event.target.value })} /></label><div className="serving-row"><span className="serving-label">PORTIONS</span><div className="stepper"><button aria-label="Diminuer le nombre de portions" onClick={() => updatePlan(item.id, { servings: Math.max(1, item.servings - 1) })}>âˆ’</button><span>{item.servings}</span><button aria-label="Augmenter le nombre de portions" onClick={() => updatePlan(item.id, { servings: item.servings + 1 })}>+</button></div><span className="serving-hint">Les quantitÃ©s sâ€™adaptent automatiquement</span></div></div>
-                <div className="ingredients-table-wrap"><table className="ingredients-table"><thead><tr><th className="need-col">Ã€ ACHETER</th><th>INGRÃ‰DIENT</th><th className="amount-col">QUANTITÃ‰</th><th className="store-col">MAGASIN PRÃ‰FÃ‰RÃ‰</th></tr></thead><tbody>
+                <div className="plan-card-controls"><label className="date-field"><span className="eyebrow">À CUISINER LE <em>· FACULTATIF</em></span><input aria-label="Date de cuisson facultative" type="date" value={item.date} onChange={(event) => updatePlan(item.id, { date: event.target.value })} /></label><div className="serving-row"><span className="serving-label">PORTIONS</span><div className="stepper"><button aria-label="Diminuer le nombre de portions" onClick={() => updatePlan(item.id, { servings: Math.max(1, item.servings - 1) })}>−</button><span>{item.servings}</span><button aria-label="Augmenter le nombre de portions" onClick={() => updatePlan(item.id, { servings: item.servings + 1 })}>+</button></div><span className="serving-hint">Les quantités s’adaptent automatiquement</span></div></div>
+                <div className="ingredients-table-wrap"><table className="ingredients-table"><thead><tr><th className="need-col">À ACHETER</th><th>INGRÉDIENT</th><th className="amount-col">QUANTITÉ</th><th className="store-col">MAGASIN PRÉFÉRÉ</th></tr></thead><tbody>
                   {recipe.ingredients.map((ingredient) => {
                     const amount = ingredient.amount * item.servings / recipe.servings
                     const options = [...ingredient.stores].sort((a, b) => a.preference - b.preference)
-                    return <tr key={ingredient.name} className={item.needs[ingredient.name] ? '' : 'not-needed'}><td><input aria-label={`Ajouter ${ingredient.name} Ã  la liste de courses`} type="checkbox" checked={!!item.needs[ingredient.name]} onChange={(event) => updatePlan(item.id, { needs: { ...item.needs, [ingredient.name]: event.target.checked } })} /></td><td className="ingredient-name">{ingredient.name}</td><td className="quantity">{formatQuantity(amount)} <span>{displayFrenchUnit(ingredient.unit, amount)}</span></td><td><select className="store-select" aria-label={`Magasin pour ${ingredient.name}`} value={item.stores[ingredient.name]} onChange={(event) => updatePlan(item.id, { stores: { ...item.stores, [ingredient.name]: event.target.value } })}>{options.map((store) => <option key={store.name} value={store.name}>{store.name}{store.preference === 1 ? ' Â· prÃ©fÃ©rÃ©' : ''}</option>)}</select></td></tr>
+                    return <tr key={ingredient.name} className={item.needs[ingredient.name] ? '' : 'not-needed'}><td><input aria-label={`Ajouter ${ingredient.name} à la liste de courses`} type="checkbox" checked={!!item.needs[ingredient.name]} onChange={(event) => updatePlan(item.id, { needs: { ...item.needs, [ingredient.name]: event.target.checked } })} /></td><td className="ingredient-name">{ingredient.name}</td><td className="quantity">{formatQuantity(amount)} <span>{displayFrenchUnit(ingredient.unit, amount)}</span></td><td><select className="store-select" aria-label={`Magasin pour ${ingredient.name}`} value={item.stores[ingredient.name]} onChange={(event) => updatePlan(item.id, { stores: { ...item.stores, [ingredient.name]: event.target.value } })}>{options.map((store) => <option key={store.name} value={store.name}>{store.name}{store.preference === 1 ? ' · préféré' : ''}</option>)}</select></td></tr>
                   })}
                 </tbody></table></div></>}
               </article>
             })}
           </div>
-          <div className="finish-row"><span><b>{groupedIngredients.length} articles</b> regroupÃ©s par magasin</span><button className="primary-button" onClick={() => setPage('review')}>VÃ©rifier les ingrÃ©dients <span>â†’</span></button></div>
+          <div className="finish-row"><span><b>{groupedIngredients.length} articles</b> regroupés par magasin</span><button className="primary-button" onClick={() => setPage('review')}>Vérifier les ingrédients <span>→</span></button></div>
 
-          <div className="saved-weekly-plans"><div className="section-heading"><div><p className="eyebrow">VOTRE HISTORIQUE</p><h2>Menus prÃ©cÃ©dents</h2></div><span className="collapse-hint">EnregistrÃ©s Ã  la confirmation de la liste de courses</span></div>
-            {savedPlans.length ? <div className="weekly-plan-archive">{savedPlans.map((savedPlan) => <article className="weekly-plan-entry" key={savedPlan.id}><div className="weekly-plan-entry-head"><button className="weekly-plan-toggle" aria-expanded={expandedSavedPlanId === savedPlan.id} onClick={() => setExpandedSavedPlanId(expandedSavedPlanId === savedPlan.id ? null : savedPlan.id)}><span className="list-icon">â—·</span><span><b>Menu de la semaine Â· {formatFrenchDate(savedPlan.createdAt, { day: 'numeric', month: 'long', year: 'numeric' })}</b><small>{formatFrenchDate(savedPlan.createdAt, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} Â· {savedPlan.items.length} recettes</small></span><span className="chevron">{expandedSavedPlanId === savedPlan.id ? 'âŒƒ' : 'âŒ„'}</span></button><button className="delete-button" aria-label={`Supprimer le menu du ${formatFrenchDate(savedPlan.createdAt, { day: 'numeric', month: 'long' })}`} title="Supprimer ce menu" onClick={() => setSavedPlans((current) => current.filter((entry) => entry.id !== savedPlan.id))}>Ã—</button></div>{expandedSavedPlanId === savedPlan.id && <div className="weekly-plan-recipes">{savedPlan.items.map((savedItem) => {const savedRecipe = recipes.find((entry) => entry.id === savedItem.recipeId); if (!savedRecipe) return null; return <div className="weekly-plan-recipe" key={savedItem.id}><span>{savedItem.date ? formatFrenchDate(`${savedItem.date}T12:00:00`, { weekday: 'short', day: 'numeric', month: 'short' }) : 'Date Ã  dÃ©finir'}</span><b>{savedRecipe.name}</b><small>{savedItem.servings} portions</small><button className="text-button" onClick={() => { setOpenRecipeId(savedRecipe.id); setPage('recipes') }}>Voir la recette</button></div>})}</div>}</article>)}</div> : <div className="archive-empty">Vos menus confirmÃ©s apparaÃ®tront ici pour vous rappeler les plats prÃ©vus.</div>}
+          <div className="saved-weekly-plans"><div className="section-heading"><div><p className="eyebrow">VOTRE HISTORIQUE</p><h2>Menus précédents</h2></div><span className="collapse-hint">Enregistrés à la confirmation de la liste de courses</span></div>
+            {savedPlans.length ? <div className="weekly-plan-archive">{savedPlans.map((savedPlan) => <article className="weekly-plan-entry" key={savedPlan.id}><div className="weekly-plan-entry-head"><button className="weekly-plan-toggle" aria-expanded={expandedSavedPlanId === savedPlan.id} onClick={() => setExpandedSavedPlanId(expandedSavedPlanId === savedPlan.id ? null : savedPlan.id)}><span className="list-icon">◷</span><span><b>Menu de la semaine · {formatFrenchDate(savedPlan.createdAt, { day: 'numeric', month: 'long', year: 'numeric' })}</b><small>{formatFrenchDate(savedPlan.createdAt, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} · {savedPlan.items.length} recettes</small></span><span className="chevron">{expandedSavedPlanId === savedPlan.id ? '⌃' : '⌄'}</span></button><button className="delete-button" aria-label={`Supprimer le menu du ${formatFrenchDate(savedPlan.createdAt, { day: 'numeric', month: 'long' })}`} title="Supprimer ce menu" onClick={() => setSavedPlans((current) => current.filter((entry) => entry.id !== savedPlan.id))}>×</button></div>{expandedSavedPlanId === savedPlan.id && <div className="weekly-plan-recipes">{savedPlan.items.map((savedItem) => {const savedRecipe = recipes.find((entry) => entry.id === savedItem.recipeId); if (!savedRecipe) return null; return <div className="weekly-plan-recipe" key={savedItem.id}><span>{savedItem.date ? formatFrenchDate(`${savedItem.date}T12:00:00`, { weekday: 'short', day: 'numeric', month: 'short' }) : 'Date à définir'}</span><b>{savedRecipe.name}</b><small>{savedItem.servings} portions</small><button className="text-button" onClick={() => { setOpenRecipeId(savedRecipe.id); setPage('recipes') }}>Voir la recette</button></div>})}</div>}</article>)}</div> : <div className="archive-empty">Vos menus confirmés apparaîtront ici pour vous rappeler les plats prévus.</div>}
           </div>
         </section>}
 
         {page === 'review' && <section className="workspace review-workspace">
-          <button className="back-link" onClick={() => setPage('plan')}>â† &nbsp;Retour au menu</button>
-          <div className="page-heading"><div><p className="eyebrow">DERNIÃˆRE VÃ‰RIFICATION</p><h1>Vos courses, <span>bien organisÃ©es.</span></h1><p className="heading-sub">Les ingrÃ©dients identiques sont regroupÃ©s par magasin.</p></div><div className="review-count"><b>{groupedIngredients.length}</b><span>articles Ã  acheter</span></div></div>
-          <div className="review-list">{[...new Set(groupedIngredients.map((item) => item.store))].map((store) => <section className="store-group" key={store}><div className="store-group-heading"><span className="store-pin">âŒ–</span><h2>{displayFrench(store)}</h2><span>{groupedIngredients.filter((item) => item.store === store).length} ARTICLES</span></div>{groupedIngredients.filter((item) => item.store === store).map((item) => <div className="review-item" key={item.id}><span>{displayFrench(item.name)}</span><b>{formatQuantity(item.amount)} <small>{displayFrenchUnit(item.unit, item.amount)}</small></b></div>)}</section>)}</div>
-          <div className="review-actions"><button className="secondary-button" onClick={() => setPage('plan')}>â† &nbsp;Retour au menu</button><button className="primary-button" disabled={!groupedIngredients.length} onClick={saveGroceryList}>Confirmer et crÃ©er la liste <span>â†’</span></button></div>
+          <button className="back-link" onClick={() => setPage('plan')}>← &nbsp;Retour au menu</button>
+          <div className="page-heading"><div><p className="eyebrow">DERNIÈRE VÉRIFICATION</p><h1>Vos courses, <span>bien organisées.</span></h1><p className="heading-sub">Les ingrédients identiques sont regroupés par magasin.</p></div><div className="review-count"><b>{groupedIngredients.length}</b><span>articles à acheter</span></div></div>
+          <div className="review-list">{[...new Set(groupedIngredients.map((item) => item.store))].map((store) => <section className="store-group" key={store}><div className="store-group-heading"><span className="store-pin">⌖</span><h2>{displayFrench(store)}</h2><span>{groupedIngredients.filter((item) => item.store === store).length} ARTICLES</span></div>{groupedIngredients.filter((item) => item.store === store).map((item) => <div className="review-item" key={item.id}><span>{displayFrench(item.name)}</span><b>{formatQuantity(item.amount)} <small>{displayFrenchUnit(item.unit, item.amount)}</small></b></div>)}</section>)}</div>
+          <div className="review-actions"><button className="secondary-button" onClick={() => setPage('plan')}>← &nbsp;Retour au menu</button><button className="primary-button" disabled={!groupedIngredients.length} onClick={saveGroceryList}>Confirmer et créer la liste <span>→</span></button></div>
         </section>}
 
-        {page === 'lists' && <section className="workspace"><div className="page-heading"><div><p className="eyebrow">PRÃŠTES POUR VOS COURSES</p><h1>Vos listes de <span>courses.</span></h1><p className="heading-sub">Vos listes confirmÃ©es sont enregistrÃ©es dans ce navigateur.</p></div><button className="secondary-button" onClick={() => setPage('plan')}>+ &nbsp;PrÃ©parer un menu</button></div>
-          {lists.length ? <div className="saved-lists">{lists.map((list) => <article className="saved-list-row" key={list.id}><button className="saved-list-open" onClick={() => { setActiveListId(list.id); setPage('detail') }}><span className="list-icon">â˜·</span><span><b>{groceryListTitle(list)}</b><small>{formatFrenchDate(list.createdAt, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small></span><span className="saved-list-stats">{list.items.length} articles Â· {list.items.filter((item) => item.checked).length} cochÃ©s</span><span className="chevron">â†’</span></button><button className="delete-button" aria-label={`Supprimer ${groceryListTitle(list)}`} title="Supprimer la liste" onClick={() => setLists((current) => current.filter((entry) => entry.id !== list.id))}>Ã—</button></article>)}</div> : <div className="empty-state"><span>â˜·</span><h2>Pas encore de liste</h2><p>Confirmez un menu de la semaine pour crÃ©er votre premiÃ¨re liste de courses.</p><button className="primary-button" onClick={() => setPage('plan')}>PrÃ©parer un menu <span>â†’</span></button></div>}
+        {page === 'lists' && <section className="workspace"><div className="page-heading"><div><p className="eyebrow">PRÊTES POUR VOS COURSES</p><h1>Vos listes de <span>courses.</span></h1><p className="heading-sub">Vos listes confirmées sont enregistrées dans ce navigateur.</p></div><button className="secondary-button" onClick={() => setPage('plan')}>+ &nbsp;Préparer un menu</button></div>
+          {lists.length ? <div className="saved-lists">{lists.map((list) => <article className="saved-list-row" key={list.id}><button className="saved-list-open" onClick={() => { setActiveListId(list.id); setPage('detail') }}><span className="list-icon">☷</span><span><b>{groceryListTitle(list)}</b><small>{formatFrenchDate(list.createdAt, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small></span><span className="saved-list-stats">{list.items.length} articles · {list.items.filter((item) => item.checked).length} cochés</span><span className="chevron">→</span></button><button className="delete-button" aria-label={`Supprimer ${groceryListTitle(list)}`} title="Supprimer la liste" onClick={() => setLists((current) => current.filter((entry) => entry.id !== list.id))}>×</button></article>)}</div> : <div className="empty-state"><span>☷</span><h2>Pas encore de liste</h2><p>Confirmez un menu de la semaine pour créer votre première liste de courses.</p><button className="primary-button" onClick={() => setPage('plan')}>Préparer un menu <span>→</span></button></div>}
         </section>}
 
-        {page === 'detail' && activeList && <section className="workspace"><button className="back-link" onClick={() => setPage('lists')}>â† &nbsp;Toutes les listes</button><div className="page-heading"><div><p className="eyebrow">{formatFrenchDate(activeList.createdAt, { weekday: 'long', day: 'numeric', month: 'long' }).toLocaleUpperCase('fr-FR')}</p><h1>Liste de courses<span>.</span></h1><p className="heading-sub">Cochez les articles au fil de vos achats. Ils passeront en bas de la liste.</p></div><div className="review-count"><b>{activeList.items.filter((item) => !item.checked).length}</b><span>articles restants</span></div></div>
-          <div className="shopping-list">{[...new Set(activeList.items.map((item) => item.store))].map((store) => {const storeItems = activeList.items.filter((item) => item.store === store).sort((a, b) => Number(a.checked) - Number(b.checked) || a.name.localeCompare(b.name)); return <section className="shop-store-group" key={store}><div className="store-group-heading"><span className="store-pin">âŒ–</span><h2>{displayFrench(store)}</h2><span>{storeItems.filter((item) => !item.checked).length} Ã€ ACHETER</span></div>{storeItems.map((item) => <label className={`shopping-item ${item.checked ? 'is-checked' : ''}`} key={item.id}><input type="checkbox" checked={item.checked} onChange={() => toggleGroceryItem(activeList.id, item.id)} aria-label={`${displayFrench(item.name)} : ${item.checked ? 'achetÃ©' : 'Ã  acheter'}`} /><span className="shopping-name">{displayFrench(item.name)}</span><span className="shopping-amount">{formatQuantity(item.amount)} {displayFrenchUnit(item.unit, item.amount)}</span></label>)}</section>})}</div>
+        {page === 'detail' && activeList && <section className="workspace"><button className="back-link" onClick={() => setPage('lists')}>← &nbsp;Toutes les listes</button><div className="page-heading"><div><p className="eyebrow">{formatFrenchDate(activeList.createdAt, { weekday: 'long', day: 'numeric', month: 'long' }).toLocaleUpperCase('fr-FR')}</p><h1>Liste de courses<span>.</span></h1><p className="heading-sub">Cochez les articles au fil de vos achats. Ils passeront en bas de la liste.</p></div><div className="review-count"><b>{activeList.items.filter((item) => !item.checked).length}</b><span>articles restants</span></div></div>
+          <div className="shopping-list">{[...new Set(activeList.items.map((item) => item.store))].map((store) => {const storeItems = activeList.items.filter((item) => item.store === store).sort((a, b) => Number(a.checked) - Number(b.checked) || a.name.localeCompare(b.name)); return <section className="shop-store-group" key={store}><div className="store-group-heading"><span className="store-pin">⌖</span><h2>{displayFrench(store)}</h2><span>{storeItems.filter((item) => !item.checked).length} À ACHETER</span></div>{storeItems.map((item) => <label className={`shopping-item ${item.checked ? 'is-checked' : ''}`} key={item.id}><input type="checkbox" checked={item.checked} onChange={() => toggleGroceryItem(activeList.id, item.id)} aria-label={`${displayFrench(item.name)} : ${item.checked ? 'acheté' : 'à acheter'}`} /><span className="shopping-name">{displayFrench(item.name)}</span><span className="shopping-amount">{formatQuantity(item.amount)} {displayFrenchUnit(item.unit, item.amount)}</span></label>)}</section>})}</div>
         </section>}
 
-        {page === 'detail' && !activeList && <section className="workspace"><div className="empty-state"><h2>Liste introuvable</h2><button className="primary-button" onClick={() => setPage('lists')}>Voir toutes les listes <span>â†’</span></button></div></section>}
+        {page === 'detail' && !activeList && <section className="workspace"><div className="empty-state"><h2>Liste introuvable</h2><button className="primary-button" onClick={() => setPage('lists')}>Voir toutes les listes <span>→</span></button></div></section>}
 
         {page === 'recipes' && (
           <section className="workspace">
             <div className="page-heading">
               <div>
-                <p className="eyebrow">QUELQUES IDÃ‰ES POUR COMMENCER</p>
+                <p className="eyebrow">QUELQUES IDÉES POUR COMMENCER</p>
                 <h1>Le carnet de <span>recettes.</span></h1>
-                <p className="heading-sub">Ajoutez vos recettes, adaptez-les et gardez vos favoris au mÃªme endroit.</p>
+                <p className="heading-sub">Ajoutez vos recettes, adaptez-les et gardez vos favoris au même endroit.</p>
               </div>
               <div className="recipe-book-actions"><span className="recipe-total">{recipes.length} RECETTES</span><button className="primary-button" onClick={() => openRecipeEditor()}>+ Nouvelle recette</button></div>
             </div>
@@ -689,22 +708,22 @@ function App() {
                     <div className="library-recipe-top">
                       <button className="library-recipe-heading" aria-expanded={openRecipeId === recipe.id} onClick={() => setOpenRecipeId(openRecipeId === recipe.id ? null : recipe.id)}>
                         <span className="library-number">0{index + 1}</span>
-                        <span className="library-name"><small>{recipe.category} Â· {recipe.types.join(' / ')}</small><b>{recipe.name}</b></span>
-                        <span className="library-time">â—· &nbsp;{recipe.time} min</span>
-                        <span className="chevron">{openRecipeId === recipe.id ? 'âŒƒ' : 'âŒ„'}</span>
+                        <span className="library-name"><small>{recipe.category} · {recipe.types.join(' / ')}</small><b>{recipe.name}</b></span>
+                        <span className="library-time">◷ &nbsp;{recipe.time} min</span>
+                        <span className="chevron">{openRecipeId === recipe.id ? '⌃' : '⌄'}</span>
                       </button>
                       <div className="recipe-header-meta">
                         <div className="rating-control" aria-label={`Noter ${recipe.name}`}>
                           <span>VOTRE NOTE</span>
-                          {[1, 2, 3, 4, 5].map((rating) => <button key={rating} className={rating <= metadata.rating ? 'star-filled' : ''} aria-label={`${rating} ${rating === 1 ? 'Ã©toile' : 'Ã©toiles'} sur 5`} aria-pressed={metadata.rating === rating} onClick={() => setRecipeRating(recipe.id, metadata.rating === rating ? 0 : rating)}>â˜…</button>)}
+                          {[1, 2, 3, 4, 5].map((rating) => <button key={rating} className={rating <= metadata.rating ? 'star-filled' : ''} aria-label={`${rating} ${rating === 1 ? 'étoile' : 'étoiles'} sur 5`} aria-pressed={metadata.rating === rating} onClick={() => setRecipeRating(recipe.id, metadata.rating === rating ? 0 : rating)}>★</button>)}
                         </div>
-                        <div className="recipe-header-actions"><span className="last-cooked">DerniÃ¨re prÃ©paration : {metadata.lastCookedAt ? formatFrenchDate(metadata.lastCookedAt, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Jamais'}</span><button className="mini-action" onClick={(event) => { event.stopPropagation(); openRecipeEditor(recipe) }}>Modifier</button><button className="mini-action danger" onClick={(event) => { event.stopPropagation(); deleteRecipe(recipe.id) }}>Supprimer</button></div>
+                        <div className="recipe-header-actions"><span className="last-cooked">Dernière préparation : {metadata.lastCookedAt ? formatFrenchDate(metadata.lastCookedAt, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Jamais'}</span><button className="mini-action" onClick={(event) => { event.stopPropagation(); openRecipeEditor(recipe) }}>Modifier</button><button className="mini-action danger" onClick={(event) => { event.stopPropagation(); deleteRecipe(recipe.id) }}>Supprimer</button></div>
                       </div>
                     </div>
                     {openRecipeId === recipe.id && (
                       <div className="recipe-details">
-                        <div><h3>IngrÃ©dients Â· {recipe.servings} portions</h3>{recipe.ingredients.map((ingredient) => <p key={ingredient.name}>{ingredient.name} <span>{formatQuantity(ingredient.amount)} {displayFrenchUnit(ingredient.unit, ingredient.amount)}</span></p>)}</div>
-                        <div><h3>PrÃ©paration</h3><ol>{recipe.instructions.map((instruction) => <li key={instruction}>{instruction}</li>)}</ol><button className="text-button" onClick={() => { addRecipe(recipe.id); setPage('plan') }}>+ Ajouter au menu de la semaine</button></div>
+                        <div><h3>Ingrédients · {recipe.servings} portions</h3>{recipe.ingredients.map((ingredient) => <p key={ingredient.name}>{ingredient.name} <span>{formatQuantity(ingredient.amount)} {displayFrenchUnit(ingredient.unit, ingredient.amount)}</span></p>)}</div>
+                        <div><h3>Préparation</h3><ol>{recipe.instructions.map((instruction) => <li key={instruction}>{instruction}</li>)}</ol><button className="text-button" onClick={() => { addRecipe(recipe.id); setPage('plan') }}>+ Ajouter au menu de la semaine</button></div>
                       </div>
                     )}
                   </article>
@@ -714,12 +733,12 @@ function App() {
           </section>
         )}
       </main>
-      {familySettingsOpen && <div className="family-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setFamilySettingsOpen(false) }}><section className="family-modal" role="dialog" aria-modal="true" aria-labelledby="family-modal-title"><button className="family-modal-close" aria-label="Fermer" onClick={() => setFamilySettingsOpen(false)}>Ã—</button><p className="eyebrow">PARTAGE FAMILIAL</p><h2 id="family-modal-title">Synchroniser vos appareils</h2><p className="family-modal-copy">Configurez la connexion une fois sur chaque tÃ©lÃ©phone. Le mÃªme code familial donne accÃ¨s aux mÃªmes menus et listes, sans compte utilisateur.</p>
+      {familySettingsOpen && <div className="family-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setFamilySettingsOpen(false) }}><section className="family-modal" role="dialog" aria-modal="true" aria-labelledby="family-modal-title"><button className="family-modal-close" aria-label="Fermer" onClick={() => setFamilySettingsOpen(false)}>×</button><p className="eyebrow">PARTAGE FAMILIAL</p><h2 id="family-modal-title">Synchroniser vos appareils</h2><p className="family-modal-copy">Configurez la connexion une fois sur chaque téléphone. Le même code familial donne accès aux mêmes menus et listes, sans compte utilisateur.</p>
         {syncError && <p className="family-error" role="alert">{syncError}</p>}
-        <form className="family-form" onSubmit={saveFamilyConnection}><p className="family-project-label">Projet partagÃ© : <b>recettes-famille</b></p><label>Code familial partagÃ©<input type="password" required minLength={16} autoComplete="new-password" placeholder="Au moins 16 caractÃ¨res" value={familyForm.accessCode} onChange={(event) => setFamilyForm({ ...familyForm, accessCode: event.target.value })} /></label><p className="family-code-note">Le code doit aussi Ãªtre dÃ©fini comme secret <code>FAMILY_ACCESS_CODE</code> dans Supabase. Il est mÃ©morisÃ© uniquement dans ce navigateur. Choisissez un code long et difficile Ã  deviner.</p><div className="family-modal-actions"><button type="button" className="secondary-button" onClick={() => setFamilySettingsOpen(false)}>Fermer</button><button type="submit" className="primary-button">Connecter cet appareil <span>â†’</span></button></div></form>
-        <p className="family-sync-footnote">{syncStatus === 'connected' ? 'Les changements se synchronisent entre appareils environ toutes les 15 secondes.' : 'En mode local, vos donnÃ©es restent enregistrÃ©es uniquement dans ce navigateur.'}</p>
+        <form className="family-form" onSubmit={saveFamilyConnection}><p className="family-project-label">Projet partagé : <b>recettes-famille</b></p><label>Code familial partagé<input type="password" required minLength={16} autoComplete="new-password" placeholder="Au moins 16 caractères" value={familyForm.accessCode} onChange={(event) => setFamilyForm({ ...familyForm, accessCode: event.target.value })} /></label><p className="family-code-note">Le code doit aussi être défini comme secret <code>FAMILY_ACCESS_CODE</code> dans Supabase. Il est mémorisé uniquement dans ce navigateur. Choisissez un code long et difficile à deviner.</p><div className="family-modal-actions"><button type="button" className="secondary-button" onClick={() => setFamilySettingsOpen(false)}>Fermer</button><button type="submit" className="primary-button">Connecter cet appareil <span>→</span></button></div></form>
+        <p className="family-sync-footnote">{syncStatus === 'connected' ? 'Les changements se synchronisent entre appareils environ toutes les 15 secondes.' : 'En mode local, vos données restent enregistrées uniquement dans ce navigateur.'}</p>
       </section></div>}
-      {recipeEditorOpen && <div className="family-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setRecipeEditorOpen(false) }}><section className="family-modal recipe-editor-modal" role="dialog" aria-modal="true" aria-labelledby="recipe-editor-title"><button className="family-modal-close" aria-label="Fermer" onClick={() => setRecipeEditorOpen(false)}>Ã—</button><p className="eyebrow">CARNET DE RECETTES</p><h2 id="recipe-editor-title">{editingRecipeId ? 'Modifier la recette' : 'Ajouter une recette'}</h2><form className="recipe-form" onSubmit={saveRecipe}><div className="recipe-form-grid"><label>Nom de la recette<input required value={recipeDraft.name} onChange={(event) => setRecipeDraft({ ...recipeDraft, name: event.target.value })} /></label><label>CatÃ©gorie<input placeholder="Ex. RAPIDE, FAMILLEâ€¦" value={recipeDraft.category} onChange={(event) => setRecipeDraft({ ...recipeDraft, category: event.target.value })} /></label><label>Temps de cuisson (minutes)<input required type="number" min="1" value={recipeDraft.time} onChange={(event) => setRecipeDraft({ ...recipeDraft, time: Number(event.target.value) })} /></label><label>Portions de base<input required type="number" min="1" value={recipeDraft.servings} onChange={(event) => setRecipeDraft({ ...recipeDraft, servings: Number(event.target.value) })} /></label><label className="recipe-form-wide">Types / cuisines<input placeholder="Ex. VÃ©gÃ©tarien, Italien, Rapide" value={recipeDraft.types.join(', ')} onChange={(event) => setRecipeDraft({ ...recipeDraft, types: event.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} /></label></div><div className="recipe-form-section"><div className="recipe-form-section-head"><h3>IngrÃ©dients</h3><button type="button" className="text-button" onClick={() => setRecipeDraft({ ...recipeDraft, ingredients: [...recipeDraft.ingredients, { name: '', amount: 1, unit: 'g', stores: storeNames.map((name, index) => ({ name, preference: index + 1 })) }] })}>+ Ajouter un ingrÃ©dient</button></div>{recipeDraft.ingredients.map((ingredient, index) => <div className="draft-ingredient" key={`${index}-${ingredient.name}`}><div className="draft-ingredient-main"><input aria-label={`Nom de lâ€™ingrÃ©dient ${index + 1}`} placeholder="IngrÃ©dient" value={ingredient.name} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, name: event.target.value } : item) })} /><input aria-label={`QuantitÃ© de lâ€™ingrÃ©dient ${index + 1}`} type="number" min="0" step="any" placeholder="QuantitÃ©" value={ingredient.amount} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, amount: Number(event.target.value) } : item) })} /><input aria-label={`UnitÃ© de lâ€™ingrÃ©dient ${index + 1}`} placeholder="g, ml, piÃ¨ceâ€¦" value={ingredient.unit} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, unit: event.target.value } : item) })} /><button type="button" className="delete-button" aria-label={`Supprimer lâ€™ingrÃ©dient ${index + 1}`} onClick={() => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.filter((_, itemIndex) => itemIndex !== index) })}>Ã—</button></div><div className="store-checks"><span>Magasins autorisÃ©s :</span>{availableStoreNames.map((store) => <label key={store}><input type="checkbox" checked={ingredient.stores.some((choice) => choice.name === store)} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => { if (itemIndex !== index) return item; const stores = event.target.checked ? [...item.stores, { name: store, preference: item.stores.length + 1 }] : item.stores.filter((choice) => choice.name !== store); return { ...item, stores } }) })} />{store}</label>)}<button type="button" className="mini-action" onClick={() => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, stores: availableStoreNames.map((name, storeIndex) => ({ name, preference: storeIndex + 1 })) } : item) })}>Tous</button></div></div>)}</div><div className="recipe-form-section"><div className="recipe-form-section-head"><h3>Instructions</h3><button type="button" className="text-button" onClick={() => setRecipeDraft({ ...recipeDraft, instructions: [...recipeDraft.instructions, ''] })}>+ Ajouter une Ã©tape</button></div>{recipeDraft.instructions.map((instruction, index) => <div className="draft-instruction" key={index}><span>{index + 1}</span><textarea aria-label={`Ã‰tape ${index + 1}`} rows={2} placeholder="DÃ©crivez cette Ã©tapeâ€¦" value={instruction} onChange={(event) => setRecipeDraft({ ...recipeDraft, instructions: recipeDraft.instructions.map((item, itemIndex) => itemIndex === index ? event.target.value : item) })} /><button type="button" className="delete-button" aria-label={`Supprimer lâ€™Ã©tape ${index + 1}`} onClick={() => setRecipeDraft({ ...recipeDraft, instructions: recipeDraft.instructions.filter((_, itemIndex) => itemIndex !== index) })}>Ã—</button></div>)}</div><div className="family-modal-actions"><button type="button" className="secondary-button" onClick={() => setRecipeEditorOpen(false)}>Annuler</button><button type="submit" className="primary-button">Enregistrer la recette <span>â†’</span></button></div></form></section></div>}
+      {recipeEditorOpen && <div className="family-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setRecipeEditorOpen(false) }}><section className="family-modal recipe-editor-modal" role="dialog" aria-modal="true" aria-labelledby="recipe-editor-title"><button className="family-modal-close" aria-label="Fermer" onClick={() => setRecipeEditorOpen(false)}>×</button><p className="eyebrow">CARNET DE RECETTES</p><h2 id="recipe-editor-title">{editingRecipeId ? 'Modifier la recette' : 'Ajouter une recette'}</h2><form className="recipe-form" onSubmit={saveRecipe}><div className="recipe-form-grid"><label>Nom de la recette<input required value={recipeDraft.name} onChange={(event) => setRecipeDraft({ ...recipeDraft, name: event.target.value })} /></label><label>Catégorie<input placeholder="Ex. RAPIDE, FAMILLE…" value={recipeDraft.category} onChange={(event) => setRecipeDraft({ ...recipeDraft, category: event.target.value })} /></label><label>Temps de cuisson (minutes)<input required type="number" min="1" value={recipeDraft.time} onChange={(event) => setRecipeDraft({ ...recipeDraft, time: Number(event.target.value) })} /></label><label>Portions de base<input required type="number" min="1" value={recipeDraft.servings} onChange={(event) => setRecipeDraft({ ...recipeDraft, servings: Number(event.target.value) })} /></label><label className="recipe-form-wide">Types / cuisines<input placeholder="Ex. Végétarien, Italien, Rapide" value={recipeDraft.types.join(', ')} onChange={(event) => setRecipeDraft({ ...recipeDraft, types: event.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} /></label></div><div className="recipe-form-section"><div className="recipe-form-section-head"><h3>Ingrédients</h3><button type="button" className="text-button" onClick={() => setRecipeDraft({ ...recipeDraft, ingredients: [...recipeDraft.ingredients, { name: '', amount: 1, unit: 'g', stores: storeNames.map((name, index) => ({ name, preference: index + 1 })) }] })}>+ Ajouter un ingrédient</button></div>{recipeDraft.ingredients.map((ingredient, index) => <div className="draft-ingredient" key={`${index}-${ingredient.name}`}><div className="draft-ingredient-main"><input aria-label={`Nom de l’ingrédient ${index + 1}`} placeholder="Ingrédient" value={ingredient.name} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, name: event.target.value } : item) })} /><input aria-label={`Quantité de l’ingrédient ${index + 1}`} type="number" min="0" step="any" placeholder="Quantité" value={ingredient.amount} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, amount: Number(event.target.value) } : item) })} /><input aria-label={`Unité de l’ingrédient ${index + 1}`} placeholder="g, ml, pièce…" value={ingredient.unit} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, unit: event.target.value } : item) })} /><button type="button" className="delete-button" aria-label={`Supprimer l’ingrédient ${index + 1}`} onClick={() => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.filter((_, itemIndex) => itemIndex !== index) })}>×</button></div><div className="store-checks"><span>Magasins autorisés :</span>{availableStoreNames.map((store) => <label key={store}><input type="checkbox" checked={ingredient.stores.some((choice) => choice.name === store)} onChange={(event) => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => { if (itemIndex !== index) return item; const stores = event.target.checked ? [...item.stores, { name: store, preference: item.stores.length + 1 }] : item.stores.filter((choice) => choice.name !== store); return { ...item, stores } }) })} />{store}</label>)}<button type="button" className="mini-action" onClick={() => setRecipeDraft({ ...recipeDraft, ingredients: recipeDraft.ingredients.map((item, itemIndex) => itemIndex === index ? { ...item, stores: availableStoreNames.map((name, storeIndex) => ({ name, preference: storeIndex + 1 })) } : item) })}>Tous</button></div></div>)}</div><div className="recipe-form-section"><div className="recipe-form-section-head"><h3>Instructions</h3><button type="button" className="text-button" onClick={() => setRecipeDraft({ ...recipeDraft, instructions: [...recipeDraft.instructions, ''] })}>+ Ajouter une étape</button></div>{recipeDraft.instructions.map((instruction, index) => <div className="draft-instruction" key={index}><span>{index + 1}</span><textarea aria-label={`Étape ${index + 1}`} rows={2} placeholder="Décrivez cette étape…" value={instruction} onChange={(event) => setRecipeDraft({ ...recipeDraft, instructions: recipeDraft.instructions.map((item, itemIndex) => itemIndex === index ? event.target.value : item) })} /><button type="button" className="delete-button" aria-label={`Supprimer l’étape ${index + 1}`} onClick={() => setRecipeDraft({ ...recipeDraft, instructions: recipeDraft.instructions.filter((_, itemIndex) => itemIndex !== index) })}>×</button></div>)}</div><div className="family-modal-actions"><button type="button" className="secondary-button" onClick={() => setRecipeEditorOpen(false)}>Annuler</button><button type="submit" className="primary-button">Enregistrer la recette <span>→</span></button></div></form></section></div>}
     </div>
   )
 }
